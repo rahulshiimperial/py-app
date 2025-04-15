@@ -1,0 +1,16 @@
+# Python cache and env
+__pycache__/
+*.pyc
+venv/
+
+# Environment config
+.env
+
+# AWS EB logs and deploy artifacts
+.elasticbeanstalk/*.log
+app.zip
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
