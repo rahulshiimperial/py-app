@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Clone Repo') {
             steps {
-                git 'https://github.com/rahulshiimperial/py-app.git'
+            git credentialsId: 'github-pat', url: 'https://github.com/rahulshiimperial/py-app.git'
             }
         }
 
