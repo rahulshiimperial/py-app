@@ -9,6 +9,12 @@ pipeline {
     }
 
     stages {
+        stage('Checkout') {
+            steps {
+                // Checkout the Git repository
+                git url: 'https://github.com/rahulshiimperial/py-app.git'
+            }
+        }
       stage('Check Versions') {
             steps {
                 sh 'docker --version'
