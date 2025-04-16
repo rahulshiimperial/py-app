@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'docker:20.10.24-dind'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
+    agent any
 
     environment {
         AWS_REGION = 'us-west-2'                 // ✔️ Update this if your region is different
@@ -14,6 +9,12 @@ pipeline {
     }
 
     stages {
+      stage('Check Versions') {
+            steps {
+                sh 'docker --version'
+                sh 'eb --version'
+            }
+        }
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t $DOCKER_IMAGE .'
