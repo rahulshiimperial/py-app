@@ -1,28 +1,17 @@
-# Use a minimal Python image
-FROM python:3.9-slim
+# Use Python 3.8 as the base image
+FROM python:3.8-slim
 
-# Set working directory
+# Set the working directory inside the container
 WORKDIR /app
 
-# Install Docker and dependencies
-USER root
-RUN apt-get update && \
-    apt-get install -y docker.io && \
-    rm -rf /var/lib/apt/lists/*
+# Copy the current directory contents into the container at /app
+COPY . /app
 
-# Install Python dependencies
-COPY requirements.txt . 
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy source code
-COPY . .
-
-# Expose Flask port
+# Expose port 5000 for Flask app
 EXPOSE 5050
 
-# Add user jenkins to docker group for Docker usage
-RUN groupadd -g 999 docker && \
-    usermod -aG docker jenkins
-
 # Run the Flask app
-CMD ["python", "devops-assessment-flask-app.py"]
+CMD ["python", "app.py"]

@@ -4,4 +4,4 @@ pymongo
 redis
 requests
 prometheus_client
-gunicorn
+
