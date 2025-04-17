@@ -3,8 +3,7 @@ name: Deploy Flask to Elastic Beanstalk
 on:
   push:
     branches:
-      - main  # or your deployment branch
-
+      - main  
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -16,7 +15,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.9'  # or your version
+        python-version: '3.9'  
 
     - name: Install dependencies
       run: |
