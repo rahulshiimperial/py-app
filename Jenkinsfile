@@ -58,7 +58,7 @@ pipeline {
                         . venv/bin/activate
                         aws --version || (echo "AWS CLI not found" && exit 1)
                         zip -r application.zip . -x '*.git*' 'env/*' '*.venv/*' '__pycache__/*'
-                        eb init ${EB_APP_NAME} --region ${AWS_REGION} --platform 'Python 3.7'
+                        eb init ${EB_APP_NAME} --region ${AWS_REGION} --platform "Docker"
                         eb use ${EB_ENV_NAME}
                         eb deploy
                         '''
