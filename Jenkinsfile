@@ -18,13 +18,8 @@ pipeline {
         stage('Set Up Python Environment') {
             steps {
                 script {
-                    // Install python3-venv if not already installed
                     sh 'sudo apt-get update && sudo apt-get install -y python3-venv'
-                    
-                    // Create a virtual environment
                     sh 'python3 -m venv venv'
-                    
-                    // Activate the virtual environment
                     sh '. venv/bin/activate'
                 }
             }
@@ -33,7 +28,6 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
-                    // Activate the virtual environment and install dependencies
                     sh '''
                     . venv/bin/activate
                     pip install --upgrade pip
@@ -47,9 +41,9 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
-                    // Activate the virtual environment and run tests
                     sh '''
                     . venv/bin/activate
+                    pip show pytest || pip install pytest
                     pytest
                     '''
                 }
@@ -60,9 +54,9 @@ pipeline {
             steps {
                 withAWS(credentials: 'aws-eb-credentials', region: "${AWS_REGION}") {
                     script {
-                        // Activate the virtual environment, zip the application, and deploy
                         sh '''
                         . venv/bin/activate
+                        aws --version || (echo "AWS CLI not found" && exit 1)
                         zip -r application.zip . -x '*.git*' 'env/*' '*.venv/*' '__pycache__/*'
                         eb init ${EB_APP_NAME} --region ${AWS_REGION} --platform 'Python 3.7'
                         eb use ${EB_ENV_NAME}
