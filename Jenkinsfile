@@ -9,6 +9,7 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/rahulshiimperial/py-app.git'
@@ -17,59 +18,54 @@ pipeline {
 
         stage('Set Up Python Environment') {
             steps {
-                script {
-                    sh 'sudo apt-get update && sudo apt-get install -y python3-venv'
-                    sh 'python3 -m venv venv'
-                    sh '. venv/bin/activate'
-                }
+                sh '''
+                sudo apt-get update && sudo apt-get install -y python3-venv
+                python3 -m venv venv
+                '''
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                script {
-                    sh '''
-                    . venv/bin/activate
-                    pip install --upgrade pip
-                    pip install -r requirements.txt
-                    pip install pytest
-                    '''
-                }
+                sh '''
+                . venv/bin/activate
+                pip install --upgrade pip
+                pip install -r requirements.txt
+                pip install pytest awsebcli
+                '''
             }
         }
 
-        stage('Install AWS CLI') {
-  steps {
-    sh '''
-      while sudo fuser /var/lib/apt/lists/lock >/dev/null 2>&1; do
-        echo "Waiting for apt lock to be released..."
-        sleep 5
-      done
+        stage('Install System Tools') {
+            steps {
+                sh '''
+                while sudo fuser /var/lib/apt/lists/lock >/dev/null 2>&1; do
+                    echo "Waiting for apt lock to be released..."
+                    sleep 5
+                done
 
-      sudo apt-get update
-      sudo apt-get install -y unzip
-      curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-      unzip awscliv2.zip
-      sudo ./aws/install
-      aws --version
-    '''
-  }
-}
+                sudo apt-get update
+                sudo apt-get install -y zip unzip curl
+                '''
+            }
+        }
 
+        stage('Package App') {
+            steps {
+                sh 'zip -r application.zip . -x "*.git*" "venv/*" "__pycache__/*"'
+            }
+        }
 
         stage('Deploy to Elastic Beanstalk') {
             steps {
                 withAWS(credentials: 'aws-eb-credentials', region: "${AWS_REGION}") {
-                    script {
-                        sh '''
-                        . venv/bin/activate
-                        aws --version || (echo "AWS CLI not found" && exit 1)
-                        zip -r application.zip . -x '*.git*' 'env/*' '*.venv/*' '__pycache__/*'
-                        eb init ${EB_APP_NAME} --region ${AWS_REGION} --platform "Docker"
-                        eb use ${EB_ENV_NAME}
-                        eb deploy
-                        '''
-                    }
+                    sh '''
+                    . venv/bin/activate
+                    aws --version || (echo "AWS CLI not found" && exit 1)
+                    eb init ${EB_APP_NAME} --region ${AWS_REGION} --platform "Docker" --debug
+                    eb use ${EB_ENV_NAME}
+                    eb deploy --staged --debug
+                    '''
                 }
             }
         }
