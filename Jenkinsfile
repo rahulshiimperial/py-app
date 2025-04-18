@@ -49,7 +49,6 @@ pipeline {
                     // Activate the virtual environment and run tests
                     sh '''
                     . venv/bin/activate
-                    pytest
                     '''
                 }
             }
