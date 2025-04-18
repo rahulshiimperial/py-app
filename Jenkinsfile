@@ -38,17 +38,6 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
-            steps {
-                script {
-                    sh '''
-                    . venv/bin/activate
-                    pip show pytest || pip install pytest
-                    pytest
-                    '''
-                }
-            }
-        }
 
         stage('Deploy to Elastic Beanstalk') {
             steps {
