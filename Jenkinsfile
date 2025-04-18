@@ -39,17 +39,23 @@ pipeline {
         }
 
         stage('Install AWS CLI') {
-         steps {
-         sh '''
-         sudo apt-get update
-         sudo apt-get install -y unzip
-         curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-         unzip awscliv2.zip
-         sudo ./aws/install
-         aws --version
-         '''
-       }
-    }
+  steps {
+    sh '''
+      while sudo fuser /var/lib/apt/lists/lock >/dev/null 2>&1; do
+        echo "Waiting for apt lock to be released..."
+        sleep 5
+      done
+
+      sudo apt-get update
+      sudo apt-get install -y unzip
+      curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+      unzip awscliv2.zip
+      sudo ./aws/install
+      aws --version
+    '''
+  }
+}
+
 
         stage('Deploy to Elastic Beanstalk') {
             steps {
