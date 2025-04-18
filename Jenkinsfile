@@ -38,6 +38,7 @@ pipeline {
                     . venv/bin/activate
                     pip install --upgrade pip
                     pip install -r requirements.txt
+                    pip install pytest
                     '''
                 }
             }
@@ -49,6 +50,7 @@ pipeline {
                     // Activate the virtual environment and run tests
                     sh '''
                     . venv/bin/activate
+                    pytest
                     '''
                 }
             }
